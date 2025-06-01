@@ -1,9 +1,9 @@
-# 📦 Streamlit App Starter Kit 
+# 📦 Hybrid Network Intrusion Detection
 ```
 ⬆️ (Replace above with your app's name)
 ```
 
-Description of the app ...
+Hybrid nwtwork intrusion detection using autoencoder for feature extraction and random forest for classification...
 
 ## Demo App
 
