@@ -6,6 +6,14 @@ import requests
 from tensorflow.keras.models import load_model
 import os # For handling file paths
 
+# --- Streamlit Page Configuration ---
+# This MUST be the very first Streamlit command in your script.
+st.set_page_config(
+    page_title="NSL-KDD Intrusion Detection",
+    layout="centered", # or "wide" depending on preference
+    initial_sidebar_state="auto" # or "expanded", "collapsed"
+)
+
 # --- Model and Preprocessing Files Download ---
 # Using st.cache_resource to avoid re-downloading and re-loading on every rerun
 # This significantly improves performance on Streamlit Cloud.
@@ -25,7 +33,7 @@ def load_resources():
 
     # Download and load scaler
     with st.spinner("Downloading and loading scaler..."):
-        response = requests.get(base_url + "scaler.pkl")
+        response = requests.get(scaler_url)
         if response.status_code == 200:
             with open(scaler_path, "wb") as f:
                 f.write(response.content)
@@ -38,7 +46,7 @@ def load_resources():
 
     # Download and load selected features
     with st.spinner("Downloading and loading selected features..."):
-        response = requests.get(base_url + "selected_features.pkl")
+        response = requests.get(features_url)
         if response.status_code == 200:
             with open(features_path, "wb") as f:
                 f.write(response.content)
@@ -51,7 +59,7 @@ def load_resources():
 
     # Download and load encoder
     with st.spinner("Downloading and loading encoder model..."):
-        response = requests.get(base_url + "encoder.h5")
+        response = requests.get(encoder_url)
         if response.status_code == 200:
             with open(encoder_path, "wb") as f:
                 f.write(response.content)
@@ -63,7 +71,7 @@ def load_resources():
 
     # Download and load Random Forest
     with st.spinner("Downloading and loading Random Forest model..."):
-        response = requests.get(base_url + "rf_model.pkl")
+        response = requests.get(rf_url)
         if response.status_code == 200:
             with open(rf_path, "wb") as f:
                 f.write(response.content)
@@ -76,7 +84,13 @@ def load_resources():
     
     return scaler, selected_features, encoder, rf_model
 
-# Load all resources at the start of the app
+# URLs for models and preprocessing files (defined here for clarity, used in load_resources)
+scaler_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/scaler.pkl"
+features_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/selected_features.pkl"
+encoder_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/encoder.h5"
+rf_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/rf_model.pkl"
+
+# Load all resources at the start of the app execution
 scaler, selected_features, encoder, rf_model = load_resources()
 
 # Label mapping for NSL-KDD (adjust based on your model's output encoding)
@@ -84,13 +98,7 @@ scaler, selected_features, encoder, rf_model = load_resources()
 # corresponding to these attack types.
 label_map = {0: 'normal', 1: 'DoS', 2: 'Probe', 3: 'R2L', 4: 'U2R'}
 
-# --- Streamlit App Configuration ---
-st.set_page_config(
-    page_title="NSL-KDD Intrusion Detection",
-    layout="centered",
-    initial_sidebar_state="auto"
-)
-
+# --- Streamlit App UI ---
 st.title("Network Intrusion Detection System")
 st.markdown(
     """
@@ -253,3 +261,4 @@ if st.button("Predict Attack Class"):
 
 st.markdown("---")
 st.markdown("Developed for Network Intrusion Detection System (NIDS) Web-App")
+
