@@ -6,10 +6,10 @@ import requests
 from tensorflow.keras.models import load_model
 
 # Download models and preprocessing files from GitHub
-scaler_url = "https://raw.githubusercontent.com/username/repo/main/scaler.pkl"
-features_url = "https://raw.githubusercontent.com/username/repo/main/selected_features.pkl"
-encoder_url = "https://raw.githubusercontent.com/username/repo/main/encoder.h5"
-rf_url = "https://raw.githubusercontent.com/username/repo/main/rf_model.pkl"
+scaler_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/scaler.pkl"
+features_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/selected_features.pkl"
+encoder_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/encoder.h5"
+rf_url = "https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/rf_model.pkl"
 
 # Load scaler
 response = requests.get(scaler_url)
