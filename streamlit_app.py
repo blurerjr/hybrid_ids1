@@ -101,118 +101,123 @@ with st.sidebar:
     st.header("Enter Connection Details")
     st.markdown("Adjust the parameters below and click 'Predict' to classify the network traffic.")
 
-    # Initialize a dictionary to hold all feature values.
-    # All features expected by the model (from `selected_features`) are initialized to 0.
+    # Initialize a dictionary to hold all feature values, set to 0 by default.
     input_features_dict = {feature: 0 for feature in selected_features}
 
-    # Attack Type
-    attack_options_display = ['Other', 'neptune', 'normal', 'satan']
+    # --- Input fields for the 15 specified features ---
+
+    # Attack Type (Handles one-hot encoding for specified attack types)
+    attack_options_display = ['Other', 'buffer_overflow', 'neptune', 'normal', 'warezclient']
     attack_selected_label = st.selectbox(
         "Attack Type:",
         attack_options_display,
-        index=0,
-        help="Select the type of attack, if known."
+        index=0, # Default to 'Other'
+        help="Select the type of attack, if known (will set corresponding one-hot encoded feature)."
     )
-    if attack_selected_label == 'neptune' and 'attack_neptune' in selected_features:
+    if attack_selected_label == 'buffer_overflow' and 'attack_buffer_overflow' in selected_features:
+        input_features_dict['attack_buffer_overflow'] = 1
+    elif attack_selected_label == 'neptune' and 'attack_neptune' in selected_features:
         input_features_dict['attack_neptune'] = 1
     elif attack_selected_label == 'normal' and 'attack_normal' in selected_features:
         input_features_dict['attack_normal'] = 1
-    elif attack_selected_label == 'satan' and 'attack_satan' in selected_features:
-        input_features_dict['attack_satan'] = 1
+    elif attack_selected_label == 'warezclient' and 'attack_warezclient' in selected_features:
+        input_features_dict['attack_warezclient'] = 1
 
     # Numerical Inputs
-    input_features_dict['count'] = st.number_input(
-        "Connection Count (past 2 seconds):",
-        value=0.0,
-        format="%.2f",
-        help="Number of connections to the same destination host in the last 2 seconds."
-    )
+    if 'count' in selected_features:
+        input_features_dict['count'] = st.number_input(
+            "Connection Count (past 2s):",
+            value=0.0,
+            format="%.2f",
+            help="Number of connections to the same destination host in the last 2 seconds."
+        )
 
-    input_features_dict['dst_host_diff_srv_rate'] = st.number_input(
-        "Dst Host Diff Srv Rate:",
-        value=0.0,
-        format="%.4f",
-        help="Percentage of connections to different services at the destination host."
-    )
+    if 'dst_host_same_src_port_rate' in selected_features:
+        input_features_dict['dst_host_same_src_port_rate'] = st.number_input(
+            "Dst Host Same Source Port Rate:",
+            value=0.0,
+            format="%.4f",
+            help="Percentage of connections to the same source port at the destination host."
+        )
 
-    input_features_dict['dst_host_same_src_port_rate'] = st.number_input(
-        "Dst Host Same Src Port Rate:",
-        value=0.0,
-        format="%.4f",
-        help="Percentage of connections to the same source port at the destination host."
-    )
+    if 'dst_host_same_srv_rate' in selected_features:
+        input_features_dict['dst_host_same_srv_rate'] = st.number_input(
+            "Dst Host Same Service Rate:",
+            value=0.0,
+            format="%.4f",
+            help="Percentage of connections to the same service at the destination host."
+        )
 
-    input_features_dict['dst_host_same_srv_rate'] = st.number_input(
-        "Dst Host Same Srv Rate:",
-        value=0.0,
-        format="%.4f",
-        help="Percentage of connections to the same service at the destination host."
-    )
+    if 'dst_host_srv_count' in selected_features:
+        input_features_dict['dst_host_srv_count'] = st.number_input(
+            "Dst Host Service Count:",
+            value=0.0,
+            format="%.2f",
+            help="Number of connections to the same service at the destination host."
+        )
 
-    input_features_dict['dst_host_srv_count'] = st.number_input(
-        "Dst Host Service Count:",
-        value=0.0,
-        format="%.2f",
-        help="Number of connections to the same service at the destination host."
-    )
-
-    # Flag Type
+    # Flag Type (Handles one-hot encoding for specified flags)
     flag_options_display = ['Other', 'S0', 'SF']
     flag_selected_label = st.selectbox(
         "Connection Status Flag:",
         flag_options_display,
-        index=0,
-        help="Status of the connection (Normal or Error)."
+        index=0, # Default to 'Other'
+        help="Status of the connection (e.g., S0 for connection rejected, SF for successful completion)."
     )
     if flag_selected_label == 'S0' and 'flag_S0' in selected_features:
         input_features_dict['flag_S0'] = 1
     elif flag_selected_label == 'SF' and 'flag_SF' in selected_features:
         input_features_dict['flag_SF'] = 1
 
-    input_features_dict['last_flag'] = st.number_input(
-        "Last Flag:",
-        value=0.0,
-        format="%.2f",
-        help="The value of the last flag observed in the connection."
-    )
+    if 'last_flag' in selected_features:
+        input_features_dict['last_flag'] = st.number_input(
+            "Last Flag Value:",
+            value=0.0,
+            format="%.2f",
+            help="Numerical representation of the last flag observed in the connection."
+        )
 
     # Logged In (binary)
-    logged_in_options_display = ['0 (Not Logged In)', '1 (Logged In)']
-    logged_in_selected_str = st.selectbox(
-        "Logged In Status:",
-        options=logged_in_options_display,
-        index=0,
-        help="1 if successfully logged in; 0 otherwise."
-    )
-    input_features_dict['logged_in'] = int(logged_in_selected_str.split(' ')[0])
+    if 'logged_in' in selected_features:
+        logged_in_options_display = ['0 (Not Logged In)', '1 (Logged In)']
+        logged_in_selected_str = st.selectbox(
+            "Logged In Status:",
+            options=logged_in_options_display,
+            index=0,
+            help="1 if successfully logged in; 0 otherwise."
+        )
+        input_features_dict['logged_in'] = int(logged_in_selected_str.split(' ')[0])
 
-    input_features_dict['same_srv_rate'] = st.number_input(
-        "Same Service Rate:",
-        value=0.0,
-        format="%.4f",
-        help="Percentage of connections that were to the same service."
-    )
+    if 'same_srv_rate' in selected_features:
+        input_features_dict['same_srv_rate'] = st.number_input(
+            "Same Service Rate:",
+            value=0.0,
+            format="%.4f",
+            help="Percentage of connections to the same service."
+        )
 
-    input_features_dict['serror_rate'] = st.number_input(
-        "SYN Error Rate:",
-        value=0.0,
-        format="%.4f",
-        help="Percentage of connections with SYN errors."
-    )
+    if 'serror_rate' in selected_features:
+        input_features_dict['serror_rate'] = st.number_input(
+            "SYN Error Rate:",
+            value=0.0,
+            format="%.4f",
+            help="Percentage of connections with SYN errors (e.g., s0, s1, s2, s3 flags)."
+        )
 
     # Service HTTP (binary)
-    service_http_options_display = ['No', 'Yes']
-    service_http_selected_label = st.selectbox(
-        "HTTP Service Used:",
-        options=service_http_options_display,
-        index=0,
-        help="Indicates if the destination network service used HTTP."
-    )
-    input_features_dict['service_http'] = 1 if service_http_selected_label == 'Yes' else 0
+    if 'service_http' in selected_features:
+        service_http_options_display = ['No', 'Yes']
+        service_http_selected_label = st.selectbox(
+            "HTTP Service Used:",
+            options=service_http_options_display,
+            index=0,
+            help="Indicates if the destination network service used HTTP."
+        )
+        input_features_dict['service_http'] = 1 if service_http_selected_label == 'Yes' else 0
 
     st.markdown("---") # Separator in sidebar
     # The Predict button
-    if st.button("Predict Attack Class in Sidebar"): # Changed button label to distinguish
+    if st.button("Predict Attack Class"): # Reverted button label for simplicity
         # This part of the code will execute when the button is clicked.
         # It's crucial to have the prediction logic here, but the result display
         # will appear in the main area.
@@ -284,3 +289,5 @@ except Exception as e:
 
 st.markdown("[Link to full dataset](https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/KDDTrain%2B.txt)")
 
+st.markdown("---")
+st.markdown("Developed for Network Intrusion Detection System (NIDS) Web-App")
