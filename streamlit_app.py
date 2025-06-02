@@ -94,12 +94,6 @@ def load_resources():
     encoder_path = "encoder.h5"
     rf_path = "rf_model.pkl"
     
-    # selected_features is already defined as MODEL_INPUT_FEATURES
-    # This might be redundant if selected_features.pkl is identical to MODEL_INPUT_FEATURES
-    # If selected_features.pkl contains the *exact* list, then load it.
-    # Otherwise, rely on MODEL_INPUT_FEATURES.
-    # For now, we'll assume MODEL_INPUT_FEATURES is the source of truth for features.
-    
     scaler_loaded, encoder_loaded, rf_model_loaded = None, None, None
 
     with st.spinner("Downloading and loading scaler..."):
@@ -161,7 +155,7 @@ label_map = {0: 'normal', 1: 'DoS', 2: 'Probe', 3: 'R2L', 4: 'U2R'}
 st.title("🛡️ Network Intrusion Detection System")
 st.markdown(
     """
-    This application utilizes a **Hybrid NIDS** approach, combining an **Autoencoder** for robust feature
+    This application leverages a **Hybrid NIDS** approach, combining an **Autoencoder** for robust feature
     transformation and a powerful **Random Forest Classifier** to accurately identify
     and categorize various network intrusion types.
     """
@@ -241,16 +235,12 @@ with st.sidebar:
             median_val = float(feature_stats.loc[feature, '50%'])
 
             # Determine appropriate step size for sliders
-            # For rates, smaller step. For counts, integer or larger step.
             if 'rate' in feature or feature == 'serror_rate':
                 step = 0.0001
                 format_str = "%.4f"
-            elif 'count' in feature:
-                step = 1.0 if (max_val - min_val) > 10 else 0.1 # Adjust step for counts
-                format_str = "%.1f"
-                if min_val == 0 and max_val == 0: # Handle cases where a feature might be all zeros
-                    max_val = 1.0 # Give it a small range
-                    median_val = 0.0
+            elif 'count' in feature or feature == 'dst_host_srv_count': # Ensure counts are treated as integers if appropriate
+                step = 1.0 if (max_val - min_val) >= 1 else 0.1 # Adjust step for counts
+                format_str = "%.0f" if (max_val - min_val) >= 1 else "%.1f"
             else: # last_flag or others
                 step = 0.01
                 format_str = "%.2f"
@@ -258,7 +248,7 @@ with st.sidebar:
             # Adjust min/max if they are too close to avoid slider issues
             if min_val == max_val:
                 max_val = min_val + 0.001 if min_val == 0 else min_val * 1.01 # ensure a small range
-                
+            
             input_features_dict[feature] = st.slider(
                 f"{feature.replace('_', ' ').title()}:", # Nicer display name
                 min_value=min_val,
@@ -270,60 +260,47 @@ with st.sidebar:
             )
 
     st.markdown("---") # Separator in sidebar
-    # The Predict button
-    if st.button("🚀 Predict Network Status"):
-        st.session_state['predict_clicked'] = True
-        st.session_state['input_features_dict'] = input_features_dict
-
-# --- Main Area: Prediction Result & About Data ---
-st.subheader("📊 Prediction Result:")
-# Check if prediction button was clicked
-if 'predict_clicked' in st.session_state and st.session_state['predict_clicked']:
-    input_features_dict_from_sidebar = st.session_state['input_features_dict']
-
-    # Create a DataFrame from the collected feature values.
-    input_df = pd.DataFrame([input_features_dict_from_sidebar])
-
-    # Reorder columns to match the `MODEL_INPUT_FEATURES` list
-    try:
-        input_df = input_df[MODEL_INPUT_FEATURES]
-    except KeyError as e:
-        st.error(f"Error: A feature expected by the model is missing. Please check `MODEL_INPUT_FEATURES`. Missing key: {e}")
-        st.stop()
-
-    # Convert to numpy array for scaling
-    input_data_for_scaling = input_df.values
-
-    # Preprocess input: scale and then encode
-    with st.spinner("Preprocessing input..."):
-        input_data_scaled = scaler.transform(input_data_for_scaling)
-        input_data_encoded = encoder.predict(input_data_scaled)
-    st.success("Input preprocessed.")
-
-    # Make prediction
-    with st.spinner("Making prediction..."):
-        prediction = rf_model.predict(input_data_encoded)
-        predicted_label = label_map.get(prediction[0], "Unknown")
     
-    st.markdown("---") # Separator for result section
+    # --- Prediction Button and Result Display (now entirely within sidebar) ---
+    st.subheader("🚀 Attack Prediction") # Subheader for the prediction section in sidebar
+    if st.button("Predict Network Status"):
+        # Create a DataFrame from the collected feature values.
+        input_df = pd.DataFrame([input_features_dict])
 
-    # --- Beautify and Display Prediction (similar to guideline) ---
-    if 'normal' in predicted_label.lower():
-        st.success(f"### Detected Activity: **{predicted_label.upper()}** ✅")
-        st.info("The model detects normal, non-intrusive network activity.")
+        # Reorder columns to match the `MODEL_INPUT_FEATURES` list
+        try:
+            input_df = input_df[MODEL_INPUT_FEATURES]
+        except KeyError as e:
+            st.error(f"Error: A feature expected by the model is missing. Please check `MODEL_INPUT_FEATURES`. Missing key: {e}")
+            # Do not stop the app, allow user to fix inputs
+            st.stop() # Or st.warning and allow continuation if safe
+
+        # Convert to numpy array for scaling
+        with st.spinner("Preprocessing input..."):
+            input_data_scaled = scaler.transform(input_data_for_scaling)
+            input_data_encoded = encoder.predict(input_data_scaled)
+        st.success("Input preprocessed.")
+
+        # Make prediction
+        with st.spinner("Making prediction..."):
+            prediction = rf_model.predict(input_data_encoded)
+            predicted_label = label_map.get(prediction[0], "Unknown")
+        
+        st.markdown("---") # Separator for result section in sidebar
+
+        # --- Beautify and Display Prediction (similar to guideline) ---
+        if 'normal' in predicted_label.lower():
+            st.success(f"### Result: **{predicted_label.upper()}** ✅")
+            st.info("The model detects normal, non-intrusive network activity.")
+        else:
+            st.warning(f"### Result: **{predicted_label.upper()}** 🚨")
+            st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. Immediate investigation recommended.")
+            st.info("The model has identified anomalous network behavior indicative of an attack.")
     else:
-        st.warning(f"### Detected Activity: **{predicted_label.upper()}** 🚨")
-        st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. Immediate investigation recommended.")
-        st.info("The model has identified anomalous network behavior indicative of an attack.")
-
-    # Reset the flag after displaying result
-    st.session_state['predict_clicked'] = False
-else:
-    st.info("Adjust parameters in the sidebar and click 'Predict Network Status' to see the classification result here.")
+        st.info("Click 'Predict Network Status' above to get the classification result.")
 
 
-st.markdown("---") # Separator in main area
-
+# --- Main Area: About Data ---
 st.header("📚 About the NSL-KDD Dataset")
 st.markdown(
     """
