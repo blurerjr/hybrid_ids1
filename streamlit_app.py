@@ -274,52 +274,51 @@ with st.sidebar:
     if st.button("🚀 Predict Network Status"):
         st.session_state['predict_clicked'] = True
         st.session_state['input_features_dict'] = input_features_dict
+    # --- Main Area: Prediction Result & About Data ---
+    st.subheader("📊 Prediction Result:")
+    # Check if prediction button was clicked
+    if 'predict_clicked' in st.session_state and st.session_state['predict_clicked']:
+        input_features_dict_from_sidebar = st.session_state['input_features_dict']
 
-# --- Main Area: Prediction Result & About Data ---
-st.subheader("📊 Prediction Result:")
-# Check if prediction button was clicked
-if 'predict_clicked' in st.session_state and st.session_state['predict_clicked']:
-    input_features_dict_from_sidebar = st.session_state['input_features_dict']
+        # Create a DataFrame from the collected feature values.
+        input_df = pd.DataFrame([input_features_dict_from_sidebar])
 
-    # Create a DataFrame from the collected feature values.
-    input_df = pd.DataFrame([input_features_dict_from_sidebar])
+        # Reorder columns to match the `MODEL_INPUT_FEATURES` list
+        try:
+            input_df = input_df[MODEL_INPUT_FEATURES]
+        except KeyError as e:
+            st.error(f"Error: A feature expected by the model is missing. Please check `MODEL_INPUT_FEATURES`. Missing key: {e}")
+            st.stop()
 
-    # Reorder columns to match the `MODEL_INPUT_FEATURES` list
-    try:
-        input_df = input_df[MODEL_INPUT_FEATURES]
-    except KeyError as e:
-        st.error(f"Error: A feature expected by the model is missing. Please check `MODEL_INPUT_FEATURES`. Missing key: {e}")
-        st.stop()
+        # Convert to numpy array for scaling
+        input_data_for_scaling = input_df.values
 
-    # Convert to numpy array for scaling
-    input_data_for_scaling = input_df.values
+        # Preprocess input: scale and then encode
+        with st.spinner("Preprocessing input..."):
+            input_data_scaled = scaler.transform(input_data_for_scaling)
+            input_data_encoded = encoder.predict(input_data_scaled)
+        #st.success("Input preprocessed.")
 
-    # Preprocess input: scale and then encode
-    with st.spinner("Preprocessing input..."):
-        input_data_scaled = scaler.transform(input_data_for_scaling)
-        input_data_encoded = encoder.predict(input_data_scaled)
-    st.success("Input preprocessed.")
-
-    # Make prediction
-    with st.spinner("Making prediction..."):
-        prediction = rf_model.predict(input_data_encoded)
-        predicted_label = label_map.get(prediction[0], "Unknown")
+        # Make prediction
+        with st.spinner("Making prediction..."):
+            prediction = rf_model.predict(input_data_encoded)
+            predicted_label = label_map.get(prediction[0], "Unknown")
     
-    st.markdown("---") # Separator for result section
+        st.markdown("---") # Separator for result section
 
-    # --- Beautify and Display Prediction (similar to guideline) ---
-    if 'normal' in predicted_label.lower():
-        st.success(f"### Detected Activity: **{predicted_label.upper()}** ✅")
-        st.info("The model detects normal, non-intrusive network activity.")
+        # --- Beautify and Display Prediction (similar to guideline) ---
+        if 'normal' in predicted_label.lower():
+            st.success(f"### Detected Activity: **{predicted_label.upper()}** ✅")
+            st.info("The model detects normal, non-intrusive network activity.")
+        else:
+            st.warning(f"### Detected Activity: **{predicted_label.upper()}** 🚨")
+            st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. Immediate investigation recommended.")
+            st.info("The model has identified anomalous network behavior indicative of an attack.")
+
+        # Reset the flag after displaying result
+        st.session_state['predict_clicked'] = False
     else:
-        st.warning(f"### Detected Activity: **{predicted_label.upper()}** 🚨")
-        st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. Immediate investigation recommended.")
-        st.info("The model has identified anomalous network behavior indicative of an attack.")
-
-    # Reset the flag after displaying result
-    st.session_state['predict_clicked'] = False
-else:
-    st.info("Adjust parameters in the sidebar and click 'Predict Network Status' to see the classification result here.")
+        st.info("Adjust parameters in the sidebar and click 'Predict Network Status' to see the classification result here.")
 
 
 st.markdown("---") # Separator in main area
