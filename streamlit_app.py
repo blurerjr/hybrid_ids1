@@ -165,8 +165,9 @@ st.markdown(
     Autoencoder for robust feature transformation and a powerful Random Forest Classifier 
     to accurately identify and categorize various network intrusion types.
     """
-    st.write("Use the sidebar to enter the feature values and predict the type of activity.")
+    
 )
+st.write("Use the sidebar to enter the feature values and predict the type of activity.")
 
 # --- Sidebar: Input Features and Prediction Button ---
 with st.sidebar:
