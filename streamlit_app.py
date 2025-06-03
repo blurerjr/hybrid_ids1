@@ -306,7 +306,6 @@ with st.sidebar:
             prediction = rf_model.predict(input_data_encoded)
             predicted_label = label_map.get(prediction[0], "Unknown")
     
-        st.markdown("---") # Separator for result section
 
         # --- Beautify and Display Prediction (similar to guideline) ---
         if 'normal' in predicted_label.lower():
