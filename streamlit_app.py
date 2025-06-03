@@ -110,7 +110,7 @@ def load_resources():
                 f.write(response.content)
             with open(scaler_path, "rb") as f:
                 scaler_loaded = pickle.load(f)
-            st.success("Scaler loaded.")
+            #st.success("Scaler loaded.")
         except requests.exceptions.RequestException as e:
             st.error(f"Failed to download scaler: {e}")
             st.stop()
@@ -125,7 +125,7 @@ def load_resources():
             with open(encoder_path, "wb") as f:
                 f.write(response.content)
             encoder_loaded = load_model(encoder_path)
-            st.success("Encoder model loaded.")
+            #st.success("Encoder model loaded.")
         except requests.exceptions.RequestException as e:
             st.error(f"Failed to download encoder: {e}")
             st.stop()
@@ -141,7 +141,7 @@ def load_resources():
                 f.write(response.content)
             with open(rf_path, "rb") as f:
                 rf_model_loaded = pickle.load(f)
-            st.success("Random Forest model loaded.")
+            #st.success("Random Forest model loaded.")
         except requests.exceptions.RequestException as e:
             st.error(f"Failed to download Random Forest model: {e}")
             st.stop()
@@ -161,9 +161,9 @@ label_map = {0: 'normal', 1: 'DoS', 2: 'Probe', 3: 'R2L', 4: 'U2R'}
 st.title("🛡️ Network Intrusion Detection System")
 st.markdown(
     """
-    This application utilizes a **Hybrid NIDS** approach, combining an **Autoencoder** for robust feature
-    transformation and a powerful **Random Forest Classifier** to accurately identify
-    and categorize various network intrusion types.
+    This application utilizes a Hybrid approach for Network Intrusion Detection, combining an 
+    Autoencoder for robust feature transformation and a powerful Random Forest Classifier 
+    to accurately identify and categorize various network intrusion types.
     """
 )
 
@@ -313,7 +313,7 @@ with st.sidebar:
         else:
             st.warning(f"### Detected Activity: **{predicted_label.upper()}** 🚨")
             st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. Immediate investigation recommended.")
-            st.info("The model has identified anomalous network behavior indicative of an attack.")
+            st.info("Proceed accordingly to further secure the system.")
 
         # Reset the flag after displaying result
         st.session_state['predict_clicked'] = False
