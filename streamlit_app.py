@@ -165,6 +165,7 @@ st.markdown(
     Autoencoder for robust feature transformation and a powerful Random Forest Classifier 
     to accurately identify and categorize various network intrusion types.
     """
+    st.write("Use the sidebar to enter the feature values and predict the type of activity.")
 )
 
 # --- Sidebar: Input Features and Prediction Button ---
@@ -342,5 +343,9 @@ except Exception as e:
 
 st.markdown("[🔗 Link to full NSL-KDD Training Data (KDDTrain+.txt)](https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/KDDTrain%2B.txt)")
 
-st.markdown("---")
-st.markdown("Developed with ❤️ for Network Intrusion Detection Systems")
+    # --- Optional: Display Raw Data ---
+with st.expander('Show Raw Data (from GitHub)'):
+    st.write("This is the combined raw data loaded from your GitHub repository.")
+    st.dataframe(full_df.head(10))
+    st.write("Label counts:")
+    st.write(pd.Series(label_encoder.inverse_transform(y_encoded)).value_counts())
