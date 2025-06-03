@@ -333,19 +333,15 @@ st.markdown(
     """
 )
 
-# Load and display the top 10 rows of the dataset
-st.subheader("First 10 Rows of NSL-KDD Training Data")
-# Use the already loaded full_df for display
-try:
-    st.dataframe(full_df.head(10))
-except Exception as e:
-    st.error(f"Error displaying dataset preview: {e}")
+with st.expander('Show Raw Data (from GitHub)'):
+    # Load and display the top 10 rows of the dataset
+    st.subheader("This is the Raw data from NSL-KDD Training Dataset")
+    # Use the already loaded full_df for display
+    try:
+        st.dataframe(full_df.head(10))
+    except Exception as e:
+        st.error(f"Error displaying dataset preview: {e}")
 
 st.markdown("[🔗 Link to full NSL-KDD Training Data (KDDTrain+.txt)](https://raw.githubusercontent.com/blurerjr/hybrid_ids1/refs/heads/master/KDDTrain%2B.txt)")
 
-    # --- Optional: Display Raw Data ---
-with st.expander('Show Raw Data (from GitHub)'):
-    st.write("This is the combined raw data loaded from your GitHub repository.")
-    st.dataframe(full_df.head(10))
-    st.write("Label counts:")
-    st.write(pd.Series(label_encoder.inverse_transform(y_encoded)).value_counts())
+
