@@ -15,13 +15,21 @@ st.set_page_config(
 page_element="""
 <style>
 [data-testid="stAppViewContainer"]{
-  background-image: url("https://github.com/blurerjr/hybrid_ids1/blob/master/ids_.png");
+  background-image: url("https://cdn.wallpapersafari.com/88/75/cLUQqJ.jpg");
+  background-size: cover;
+}
+[data-testid="stHeader"]{
+  background-color: rgba(0,0,0,0);
+}
+[data-testid="stToolbar"]{
+  right: 2rem;
+  background-image: url("https://img.freepik.com/premium-vector/burger-icon-isolated-illustration_92753-2926.jpg?w=2000");
   background-size: cover;
 }
 </style>
 """
-
 st.markdown(page_element, unsafe_allow_html=True)
+
 
 # Define the 15 selected features for your model input
 # This list is crucial for filtering and ordering the inputs
