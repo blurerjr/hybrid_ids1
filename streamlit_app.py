@@ -30,7 +30,7 @@ def set_background_image(image_url):
 
 # Call the function with your chosen image URL at the top of your app
 # Example:
-set_background_image("https://images.unsplash.com/photo-1579546929518-92787fccd0f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80")
+set_background_image("https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d")
 
 
 # Define the 15 selected features for your model input
