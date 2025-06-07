@@ -15,7 +15,7 @@ st.set_page_config(
 page_element="""
 <style>
 [data-testid="stAppViewContainer"]{
-  background-image: url("https://wallpapersafari.com/w/eVTtgG.jpg");
+  background-image: url("https://wallpapersafari.com/w/eVTtgG");
   background-size: cover;
 }
 </style>
