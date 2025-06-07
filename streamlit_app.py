@@ -313,8 +313,7 @@ with st.sidebar:
             st.info("The model detects normal, non-intrusive network activity.")
         else:
             st.warning(f"### Detected Activity: **{predicted_label.upper()}** 🚨")
-            st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. 
-            Activate Firewall to Further protect the system.")
+            st.error(f"**Potential Intrusion Detected!** Type: **{predicted_label}**. Activate Firewall to Further protect the system.")
             st.info("Proceed accordingly to further secure the system.")
 
         # Reset the flag after displaying result
