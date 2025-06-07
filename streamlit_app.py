@@ -12,23 +12,25 @@ st.set_page_config(
     layout="wide", # Changed to wide for more space with sidebar and main content
     initial_sidebar_state="expanded"
 )
-page_element="""
-<style>
-[data-testid="stAppViewContainer"]{
-  background-image: url("https://cdn.wallpapersafari.com/88/75/cLUQqJ.jpg");
-  background-size: cover;
-}
-[data-testid="stHeader"]{
-  background-color: rgba(0,0,0,0);
-}
-[data-testid="stToolbar"]{
-  right: 2rem;
-  background-image: url("https://img.freepik.com/premium-vector/burger-icon-isolated-illustration_92753-2926.jpg?w=2000");
-  background-size: cover;
-}
-</style>
-"""
-st.markdown(page_element, unsafe_allow_html=True)
+def set_background_image(image_url):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("{image_url}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; /* Keeps background fixed when scrolling */
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call the function with your chosen image URL at the top of your app
+# Example:
+set_background_image("https://images.unsplash.com/photo-1579546929518-92787fccd0f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80")
 
 
 # Define the 15 selected features for your model input
