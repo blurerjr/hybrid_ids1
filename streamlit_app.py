@@ -12,6 +12,16 @@ st.set_page_config(
     layout="wide", # Changed to wide for more space with sidebar and main content
     initial_sidebar_state="expanded"
 )
+page_element="""
+<style>
+[data-testid="stAppViewContainer"]{
+  background-image: url("https://cdn.wallpapersafari.com/88/75/cLUQqJ.jpg");
+  background-size: cover;
+}
+</style>
+"""
+
+st.markdown(page_element, unsafe_allow_html=True)
 
 # Define the 15 selected features for your model input
 # This list is crucial for filtering and ordering the inputs
