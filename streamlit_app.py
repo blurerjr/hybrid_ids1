@@ -185,6 +185,12 @@ st.markdown(
     """
     
 )
+st.header("💡 How Our System Works")
+st.markdown("""
+Our advanced Intrusion Detection System operates in two key phases:
+* **Feature Transformation (Autoencoder):** Raw network traffic data is first processed by an Autoencoder. This powerful neural network learns the most important, underlying patterns in the data, reducing noise and highlighting anomalies.
+* **Threat Classification (Random Forest):** The transformed data is then fed into a Random Forest Classifier. This ensemble learning model excels at identifying and categorizing different types of network intrusions, from normal traffic to sophisticated attacks like DoS, Probe, R2L, and U2R.
+""")
 st.write("Use the sidebar to enter the feature values and predict the type of activity.")
 
 # --- Sidebar: Input Features and Prediction Button ---
