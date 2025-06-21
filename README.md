@@ -7,7 +7,7 @@ Hybrid nwtwork intrusion detection using autoencoder for feature extraction and 
 
 ## Demo App
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://app-starter-kit.streamlit.app/)
+[![Streamlit App]([https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://app-starter-kit.streamlit.app/](https://hybrid-ids.streamlit.app/))
 
 ## GitHub Codespaces
 
@@ -15,11 +15,11 @@ Hybrid nwtwork intrusion detection using autoencoder for feature extraction and 
 
 ## Section Heading
 
-This is filler text, please replace this with text for this section.
-
+An Hybrid Network Intrusion Detection developed using Autoencoder and Random forest, It is hosted on streamlit for easy accessibility
 ## Further Reading
 
-This is filler text, please replace this with a explanatory text about further relevant resources for this repo
-- Resource 1
-- Resource 2
-- Resource 3
+Improving IDS SYSTEM
+- Google.com
+- Kaggle.com
+- Geeksforgeeks.com
+
